@@ -53,30 +53,21 @@ var Module = {
     statusElement.innerHTML = text || '';
   }
 };
+// --- Preload config and auto-load ROM ---
+Promise.all([
+  fetch('gles2n64.conf')
+    .then(r => r.text())
+    .then(text => FS.writeFile('gles2n64.conf', text, {encoding:'utf8'})),
 
-// Load config dynamically
-fetch('gles2n64.conf')
-  .then(r => r.arrayBuffer())
-  .then(data => {
-    FS.writeFile('gles2n64.conf', new Uint8Array(data), {encoding:'utf8'});
-  })
-  .catch(err => console.error("Failed to load config:", err));
-
-  
-// Auto-load the ROM
-fetch('https://file.garden/aXN9PJNqeHbDU8np/baserom.z64')
-  .then(r => r.arrayBuffer())
-  .then(data => {
-    if (!Module.FS) Module.FS = FS;
-    FS.writeFile('sm64.z64', new Uint8Array(data), {encoding: 'binary'});
-    spinnerElement.style.display = 'none';
-    statusElement.style.display = 'none';
-    Module['callMain'](['--resolution', '640x480', 'sm64.z64']);
-  })
-  .catch(err => {
-    console.error("Failed to load ROM:", err);
-    statusElement.innerHTML = 'Failed to load ROM';
-  });
+  fetch('baserom.z64')
+    .then(r => r.arrayBuffer())
+    .then(data => FS.writeFile('sm64.z64', new Uint8Array(data), {encoding:'binary'}))
+])
+.then(() => {
+  // Both config and ROM exist in FS → start emulator
+  Module.callMain(['--resolution','640x480','sm64.z64']);
+})
+.catch(err => console.error('Failed to prepare emulator:', err));
 </script>
 
 <script async type="text/javascript" src="mupen64plus-ui-console.js"></script>
