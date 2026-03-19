@@ -63,7 +63,7 @@ Module.preRun.push(() => {
     .then(text => FS.writeFile('gles2n64.conf', text, {encoding:'utf8'}))
     .then(() => {
       // Write ROM to FS
-      return fetch('baserom.z64')
+      return fetch('https://file.garden/aXN9PJNqeHbDU8np/baserom.z64')
         .then(r => r.arrayBuffer())
         .then(data => FS.writeFile('sm64.z64', new Uint8Array(data), {encoding:'binary'}));
     })
