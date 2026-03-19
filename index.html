@@ -54,6 +54,15 @@ var Module = {
   }
 };
 
+// Load config dynamically
+fetch('gles2n64.conf')
+  .then(r => r.arrayBuffer())
+  .then(data => {
+    FS.writeFile('gles2n64.conf', new Uint8Array(data), {encoding:'utf8'});
+  })
+  .catch(err => console.error("Failed to load config:", err));
+
+  
 // Auto-load the ROM
 fetch('https://file.garden/aXN9PJNqeHbDU8np/baserom.z64')
   .then(r => r.arrayBuffer())
